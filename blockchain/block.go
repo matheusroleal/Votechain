@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"time"
 	"encoding/hex"
+	"fmt"
+	"strings"
 )
 
 type Block struct {
@@ -16,6 +18,7 @@ type Block struct {
 	Nonce      string
 }
 
+const difficulty = 1
 
 func calculateHash(block Block) string {
 	record := string(block.Index) + block.Timestamp + block.Vote + block.PrevHash + block.Nonce
@@ -30,12 +33,29 @@ func generateBlock(oldBlock Block, data string) (Block, error) {
 
   newBlock.Index = oldBlock.Index + 1
   newBlock.Timestamp = time.Now().String()
+	newBlock.Vote = data
   newBlock.PrevHash = oldBlock.Hash
-  newBlock.Vote = data
-  newBlock.PrevHash = oldBlock.Hash
-  newBlock.Hash = calculateHash(newBlock)
+	newBlock.Difficulty = difficulty
 
+	for i := 0; ; i++ {
+		hex := fmt.Sprintf("%x", i)
+		newBlock.Nonce = hex
+		if !checkHashValidation(calculateHash(newBlock), newBlock.Difficulty) {
+			fmt.Println(calculateHash(newBlock))
+			time.Sleep(time.Second)
+			continue
+		} else {
+			fmt.Println(calculateHash(newBlock), " work done!")
+			newBlock.Hash = calculateHash(newBlock)
+			break
+		}
+	}
   return newBlock, nil
+}
+
+func checkHashValidation(hash string, difficulty int) bool {
+	prefix := strings.Repeat("0", difficulty)
+	return strings.HasPrefix(hash, prefix)
 }
 
 func checkBlockValidation(newBlock, oldBlock Block) bool {

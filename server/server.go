@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
   "encoding/json"
 	"net/http"

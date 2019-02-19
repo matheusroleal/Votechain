@@ -11,6 +11,7 @@ type Transaction struct {
 }
 
 var Blockchain []Block
+const difficulty = 1
 
 func replaceChain(newBlock []Block) {
 	if len(Blockchain) < len(newBlock) {
@@ -26,13 +27,13 @@ func CreateChain(t *Transaction){
     fmt.Printf("ERROR: Could not generate block")
   }
 
-  Blockchain = append(Blockchain, newBlock)
-
-  fmt.Print("New Block Created: ")
-  fmt.Print(newBlock)
+  if checkBlockValidation(newBlock, Blockchain[last_index_block]) {
+    Blockchain = append(Blockchain, newBlock)
+    fmt.Print(newBlock)
+  }
 }
 
 func GenesisBlock() {
-	genesisBlock := Block{0, time.Now().String(), "", "", ""}
+	genesisBlock := Block{0, time.Now().String(), "", "", "", difficulty, ""}
 	Blockchain = append(Blockchain, genesisBlock)
 }

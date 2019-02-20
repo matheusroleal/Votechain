@@ -30,16 +30,25 @@ func CreateChain(t *Transaction){
 
   if e != nil {
     fmt.Printf("ERROR: Could not generate block")
-  }
-
-  if checkBlockValidation(newBlock, Blockchain[last_index_block]) {
-    Blockchain = append(Blockchain, newBlock)
-    spew.Dump(newBlock)
+  } else {
+    if checkBlockValidation(newBlock, Blockchain[last_index_block]) {
+      Blockchain = append(Blockchain, newBlock)
+      spew.Dump(newBlock)
+    }
   }
 }
 
 func GenesisBlock() {
-	genesisBlock := Block{0, time.Now().String(), "", "", "", difficulty, ""}
+	var genesisBlock Block
+
+  genesisBlock.Index = 0
+  genesisBlock.Timestamp = time.Now().String()
+  genesisBlock.Vote = ""
+  genesisBlock.PrevHash = ""
+  genesisBlock.Difficulty = difficulty
+  genesisBlock.Nonce = ""
+  genesisBlock.Hash = calculateHash(genesisBlock)
+
   spew.Dump(genesisBlock)
 
   mutex.Lock()

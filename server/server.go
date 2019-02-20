@@ -28,7 +28,6 @@ func (g *CreateBlockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func Run() {
-  // addr := "127.0.0.1:8081"
 	router := httptreemux.NewContextMux()
 	server := &http.Server{
 		Addr:         "0.0.0.0:8081",
@@ -37,10 +36,9 @@ func Run() {
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  time.Second,
 	}
-	blockchain.GenesisBlock()
-  router.Handler(http.MethodPost, "/newTransaction/", &CreateBlockHandler{})
 
-  // log.Printf("Running web server on: http://%s\n", addr)
-  // log.Fatal(http.ListenAndServe(addr, router))
+  router.Handler(http.MethodPost, "/newTransaction/", &CreateBlockHandler{})
 	log.Fatal(server.ListenAndServe())
+
+	blockchain.GenesisBlock()
 }

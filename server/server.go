@@ -27,7 +27,7 @@ func (g *CreateBlockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func Run() {
-  addr := "127.0.0.1:8081"
+  addr := "0.0.0.0:8081"
   router := httptreemux.NewContextMux()
 	blockchain.GenesisBlock()
   router.Handler(http.MethodPost, "/newTransaction/", &CreateBlockHandler{})

@@ -12,27 +12,29 @@ type Transaction struct {
 	Token int    `json:"token"`
 }
 
-var Blockchain []Block
+var Chain []Block
 var mutex = &sync.Mutex{}
 
-func replaceChain(newBlock []Block) {
-	if len(Blockchain) < len(newBlock) {
-		Blockchain = newBlock
+func ReplaceChain(newBlock []Block) {
+	if len(Chain) < len(newBlock) {
+		Chain = newBlock
 	}
 }
 
 func CreateChain(t *Transaction){
-  last_index_block := len(Blockchain) - 1
+  last_index_block := len(Chain) - 1
 
   mutex.Lock()
-  newBlock,e := generateBlock(Blockchain[last_index_block], t.Data)
+  newBlock,e := generateBlock(Chain[last_index_block], t.Data)
   mutex.Unlock()
 
   if e != nil {
     fmt.Printf("ERROR: Could not generate block")
   } else {
-    if checkBlockValidation(newBlock, Blockchain[last_index_block]) {
-      Blockchain = append(Blockchain, newBlock)
+    if checkBlockValidation(newBlock, Chain[last_index_block]) {
+      mutex.Lock()
+      Chain = append(Chain, newBlock)
+      mutex.Unlock()
       spew.Dump(newBlock)
     }
   }
@@ -52,6 +54,6 @@ func GenesisBlock() {
   spew.Dump(genesisBlock)
 
   mutex.Lock()
-	Blockchain = append(Blockchain, genesisBlock)
+	Chain = append(Chain, genesisBlock)
   mutex.Unlock()
 }

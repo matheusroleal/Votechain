@@ -49,12 +49,11 @@ func main() {
 
   if err != nil {
     fmt.Println("Stream open failed", err)
-    } else {
-      rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
+  } else {
+    rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
 
-      go p2p.WriteData(rw)
-      go p2p.ReadData(rw)
-    }
-
-    select {}
+    go p2p.WriteData(rw)
+    go p2p.ReadData(rw)
   }
+  select {}
+}

@@ -1,5 +1,13 @@
 package mdns
 
+// MDNS
+// Discover a peer in the network (using mdns), connect to it and open a chat stream. This code is heavily influenced by (and shamelessly copied from) chat-with-rendezvous example
+//
+// Authors:
+// 	Bineesh Lazar
+//
+// Reference: https://github.com/libp2p/go-libp2p-examples/tree/master/chat-with-mdns
+
 import (
 	"context"
 	"time"

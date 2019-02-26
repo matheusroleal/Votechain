@@ -1,5 +1,5 @@
 run:
-	go run main.go -l 10000 -secio
+	go run main.go -l $(shell shuf -i 1-65536 -n 1) -secio
 
 setup: setup-go setup-p2p-go
 

@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"bufio"
+	"log"
 	"fmt"
 	"os"
 	"sync"
@@ -19,7 +20,7 @@ func ReadData(rw *bufio.ReadWriter) {
 		for {
 			str, err := rw.ReadString('\n')
 			if err != nil {
-				fmt.Println("Error reading from buffer")
+				log.Println("Error reading from buffer")
 				panic(err)
 			}
 
@@ -31,7 +32,7 @@ func ReadData(rw *bufio.ReadWriter) {
 				chain := make([]blockchain.Block, 0)
 
 				if err := json.Unmarshal([]byte(str), &chain); err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				}
 				mutex.Lock()
 				blockchain.ReplaceChain(chain)
@@ -48,7 +49,7 @@ func WriteData(rw *bufio.ReadWriter) {
 			mutex.Lock()
 			bytes, err := json.Marshal(blockchain.Chain)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			mutex.Unlock()
 
@@ -65,7 +66,7 @@ func WriteData(rw *bufio.ReadWriter) {
 		fmt.Print("> ")
 		sendData, err := stdReader.ReadString('\n')
 		if err != nil {
-			fmt.Println("Error reading from stdin")
+			log.Println("Error reading from stdin")
 			panic(err)
 		}
 
@@ -80,7 +81,7 @@ func WriteData(rw *bufio.ReadWriter) {
 
 		bytes, err := json.Marshal(blockchain.Chain)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		spew.Dump(blockchain.Chain)
@@ -88,12 +89,12 @@ func WriteData(rw *bufio.ReadWriter) {
 		mutex.Lock()
 		_, err = rw.WriteString(fmt.Sprintf("%s\n", string(bytes)))
 		if err != nil {
-			fmt.Println("Error writing to buffer")
+			log.Println("Error writing to buffer")
 			panic(err)
 		}
 		err = rw.Flush()
 		if err != nil {
-			fmt.Println("Error flushing buffer")
+			log.Println("Error flushing buffer")
 			panic(err)
 		}
 		mutex.Unlock()

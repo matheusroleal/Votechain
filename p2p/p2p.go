@@ -6,6 +6,7 @@ import (
   "fmt"
   "crypto/rand"
   "context"
+  "log"
   mrand "math/rand"
 
   host "github.com/libp2p/go-libp2p-host"
@@ -43,18 +44,13 @@ func MakeHost(listenPort int, secio bool, randseed int64) (host.Host, error){
 
 	addr := basicHost.Addrs()[0]
 	fullAddr := addr.Encapsulate(hostAddr)
-	fmt.Printf("I am %s\n", fullAddr)
-	if secio {
-		fmt.Printf("Now run \"go run main.go -l %d -d %s -secio\" on a different terminal\n", listenPort+1, fullAddr)
-	} else {
-		fmt.Printf("Now run \"go run main.go -l %d -d %s\" on a different terminal\n", listenPort+1, fullAddr)
-	}
+	log.Printf("I am %s\n", fullAddr)
 
 	return basicHost, nil
 }
 
 func HandleStream(stream net.Stream) {
-  fmt.Println("Got a new stream!")
+  log.Println("Got a new stream!")
 
 	rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
 

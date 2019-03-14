@@ -21,7 +21,7 @@ func ReadData(rw *bufio.ReadWriter) {
 			str, err := rw.ReadString('\n')
 			if err != nil {
 				log.Println("Error reading from buffer")
-				return
+				panic(err)
 			}
 
 			if str == "" {
@@ -67,7 +67,7 @@ func WriteData(rw *bufio.ReadWriter) {
 		sendData, err := stdReader.ReadString('\n')
 		if err != nil {
 			log.Println("Error reading from stdin")
-			return
+			panic(err)
 		}
 
 		sentData := strings.Replace(sendData, "\n", "", -1)
@@ -90,12 +90,12 @@ func WriteData(rw *bufio.ReadWriter) {
 		_, err = rw.WriteString(fmt.Sprintf("%s\n", string(bytes)))
 		if err != nil {
 			log.Println("Error writing to buffer")
-			return
+			panic(err)
 		}
 		err = rw.Flush()
 		if err != nil {
 			log.Println("Error flushing buffer")
-			return
+			panic(err)
 		}
 		mutex.Unlock()
 

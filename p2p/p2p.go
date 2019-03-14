@@ -4,9 +4,9 @@ import (
   "bufio"
   "io"
   "fmt"
+  "log"
   "crypto/rand"
   "context"
-  "log"
   mrand "math/rand"
 
   host "github.com/libp2p/go-libp2p-host"
@@ -24,14 +24,14 @@ func MakeHost(listenPort int, secio bool, randseed int64) (host.Host, error){
   	r = mrand.New(mrand.NewSource(randseed))
   }
 
-	priv, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	prvKey, pblKey, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
 	if err != nil {
 		return nil, err
 	}
 
 	opts := []libp2p.Option{
 		libp2p.ListenAddrStrings(fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", listenPort)),
-		libp2p.Identity(priv),
+		libp2p.Identity(prvKey),
     libp2p.DisableRelay(),
 	}
 

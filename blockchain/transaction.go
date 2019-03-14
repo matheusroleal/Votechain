@@ -8,8 +8,8 @@ import (
 )
 
 type Transaction struct {
-	Data  string `json:"data"`
-	Token int    `json:"token"`
+	Vote  string `json:"vote"`
+	Key int    `json:"key"`
 }
 
 var Chain []Block
@@ -25,7 +25,7 @@ func CreateChain(t *Transaction){
   last_index_block := len(Chain) - 1
 
   mutex.Lock()
-  newBlock,e := generateBlock(Chain[last_index_block], t.Data)
+  newBlock,e := generateBlock(Chain[last_index_block], t.Data, t.Key)
   mutex.Unlock()
 
   if e != nil {
@@ -49,6 +49,7 @@ func GenesisBlock() {
   genesisBlock.PrevHash = ""
   genesisBlock.Difficulty = difficulty
   genesisBlock.Nonce = ""
+  genesisBlock.Address = ""
   genesisBlock.Hash = calculateHash(genesisBlock)
 
   spew.Dump(genesisBlock)

@@ -16,6 +16,7 @@ type Block struct {
 	PrevHash   string
 	Difficulty int
 	Nonce      string
+	Address		 string
 }
 
 const difficulty = 1
@@ -28,12 +29,13 @@ func calculateHash(block Block) string {
 	return hex.EncodeToString(hashed)
 }
 
-func generateBlock(oldBlock Block, data string) (Block, error) {
+func generateBlock(oldBlock Block, data string, key string) (Block, error) {
   var newBlock Block
 
   newBlock.Index = oldBlock.Index + 1
   newBlock.Timestamp = time.Now().String()
 	newBlock.Vote = data
+	newBlock.Address = key
   newBlock.PrevHash = oldBlock.Hash
 	newBlock.Difficulty = difficulty
 

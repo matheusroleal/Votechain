@@ -9,7 +9,7 @@ import (
 
 type Transaction struct {
 	Vote  string `json:"vote"`
-	Key int    `json:"key"`
+	Key string    `json:"key"`
 }
 
 var Chain []Block
@@ -25,7 +25,7 @@ func CreateChain(t *Transaction){
   last_index_block := len(Chain) - 1
 
   mutex.Lock()
-  newBlock,e := generateBlock(Chain[last_index_block], t.Data, t.Key)
+  newBlock,e := generateBlock(Chain[last_index_block], t.Vote, t.Key)
   mutex.Unlock()
 
   if e != nil {

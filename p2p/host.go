@@ -24,7 +24,7 @@ func MakeHost(listenPort int, secio bool, randseed int64) (host.Host, error){
   	r = mrand.New(mrand.NewSource(randseed))
   }
 
-	prvKey, pblKey, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
+	prvKey, _, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, r)
 	if err != nil {
 		return nil, err
 	}

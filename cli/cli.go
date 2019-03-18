@@ -9,15 +9,8 @@ import (
   "net/http"
 
   "github.com/urfave/cli"
+  types "github.com/matheusroleal/Votechain/types"
 )
-
-type SendTxResponse struct {
-    Txid       string
-}
-
-type GetNewAddressResponse struct {
-    Address     string
-}
 
 func SendVote(c *cli.Context) error{
   if len(c.Args()) != 2 {
@@ -31,11 +24,14 @@ func SendVote(c *cli.Context) error{
   }
   to := c.String("to")
 
-  var res SendTxResponse
+  var res types.SendTxResponse
   err := Call("sendtx", map[string]string{
       "to": to,
       "from": from,
   }, &res)
+  if err != nil {
+    return err
+  }
 
   out, err := json.MarshalIndent(res, "","  ")
   if err != nil {
@@ -46,8 +42,12 @@ func SendVote(c *cli.Context) error{
 }
 
 func GetNewAddress(c *cli.Context) error{
-  var res GetNewAddressResponse
+  var res types.GetNewAddressResponse
+
   err := Call("getnewaddress", map[string]string{}, &res)
+  if err != nil {
+    return err
+  }
 
   out, err := json.MarshalIndent(res, "","  ")
   if err != nil {

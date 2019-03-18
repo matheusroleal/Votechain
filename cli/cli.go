@@ -4,6 +4,9 @@ import (
   "fmt"
   "log"
   "os"
+  "encoding/json"
+  "net/url"
+  "net/http"
 
   "github.com/urfave/cli"
 )
@@ -26,9 +29,9 @@ func SendVote(c *cli.Context) error{
   } else {
       from = c.String("from")
   }
-  memo := c.String("to")
+  to := c.String("to")
 
-  var res types.SendTxResponse
+  var res SendTxResponse
   err := Call("sendtx", map[string]string{
       "to": to,
       "from": from,
@@ -38,12 +41,12 @@ func SendVote(c *cli.Context) error{
   if err != nil {
     return err
   }
-  fmt.Println(string(out))
+  log.Println(string(out))
   return nil
 }
 
-func GetNewAddress(c *cli.Context){
-  var res types.SendTxResponse
+func GetNewAddress(c *cli.Context) error{
+  var res GetNewAddressResponse
   err := Call("getnewaddress", map[string]string{}, &res)
 
   out, err := json.MarshalIndent(res, "","  ")
@@ -54,7 +57,7 @@ func GetNewAddress(c *cli.Context){
   return nil
 }
 
-func Call(cmd string, options map[string]string, out interface{}){
+func Call(cmd string, options map[string]string, out interface{}) error{
   vals := make(url.Values)
   for k, v := range options {
       vals.Set(k, v)

@@ -29,7 +29,7 @@ func calculateHash(block Block) string {
 	return hex.EncodeToString(hashed)
 }
 
-func generateBlock(oldBlock Block, data string, key string) (Block, error) {
+func GenerateBlock(oldBlock Block, data string, key string) (Block, error) {
   var newBlock Block
 
   newBlock.Index = oldBlock.Index + 1

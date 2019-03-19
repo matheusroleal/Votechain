@@ -35,7 +35,8 @@ func (node *Node) BroadcastBlock(t *Transaction) *types.SendTxResponse{
 	if e != nil {
 		log.Printf("ERROR: Could not generate block")
 	} else {
-		data, err := json.Marshal(newBlock)
+		node.blockchain.CreateChain(newBlock)
+		data, err := json.Marshal(node.blockchain)
 		if err != nil{
 			log.Printf("ERROR: Could not send block")
 		}
@@ -58,15 +59,15 @@ func (node *Node) ListenBlocks(ctx context.Context) {
 				panic(err)
 			}
 
-			block := blockchain.Block{}
+			newBlockchain := blockchain.Blockchain{}
 
-			err = json.Unmarshal(msg.GetData(), &block)
+			err = json.Unmarshal(msg.GetData(), &newBlockchain)
 			if err != nil {
 				return
 			}
 
 			mutex.Lock()
-			blockchain.CreateChain(node.blockchain,block)
+			node.blockchain.ReplaceChain(newBlockchain.Chain)
 			mutex.Unlock()
 
 			spew.Dump(node.blockchain.Chain)

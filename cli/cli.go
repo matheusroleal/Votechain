@@ -13,7 +13,7 @@ import (
 )
 
 func SendVote(c *cli.Context) error{
-  if len(c.Args()) != 2 {
+  if c.NumFlags() != 2 {
       return fmt.Errorf("To and amount must be specified")
   }
   var from string
@@ -25,7 +25,7 @@ func SendVote(c *cli.Context) error{
   to := c.String("to")
 
   var res types.SendTxResponse
-  err := Call("sendtx", map[string]string{
+  err := Call("sendvote", map[string]string{
       "to": to,
       "from": from,
   }, &res)
@@ -69,7 +69,7 @@ func Call(cmd string, options map[string]string, out interface{}) error{
   }
   err = json.NewDecoder(resp.Body).Decode(out)
   if err != nil {
-      return err
+    return err
   }
   return nil
 }

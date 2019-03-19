@@ -1,59 +1,56 @@
 package main
 
 import (
-  "bufio"
-  "context"
-  "flag"
-  "log"
+	"context"
+	"log"
+	"net/http"
+	"encoding/json"
+	"flag"
 
-  golog "github.com/ipfs/go-log"
+	golog "github.com/ipfs/go-log"
   gologging "github.com/whyrusleeping/go-logging"
-  blockchain "github.com/matheusroleal/Votechain/blockchain"
-  p2p "github.com/matheusroleal/Votechain/p2p"
-  mdns "github.com/matheusroleal/Votechain/mdns"
+	p2p "github.com/matheusroleal/Votechain/p2p"
 )
 
 func main() {
-  blockchain.GenesisBlock()
-
   golog.SetAllLoggers(gologging.INFO) // Change to DEBUG for extra info
 
-  listenF := flag.Int("l", 0, "wait for incoming connections")
-  secio := flag.Bool("secio", false, "enable secio")
-  seed := flag.Int64("seed", 0, "set random seed for id generation")
-  flag.Parse()
+	listenF := flag.Int("l", 0, "wait for incoming connections")
+	flag.Parse()
 
-  if *listenF == 0 {
-    log.Println("Please provide a port to bind on with -l")
-  }
+	if *listenF == 0 {
+		log.Println("Please provide a port to bind on with -l")
+	}
 
-  ha, err := p2p.MakeHost(*listenF, *secio, *seed)
-  if err != nil {
-    log.Println(err)
-  }
+	ctx := context.Background()
 
-  ha.SetStreamHandler("/p2p/1.0.0", p2p.HandleStream)
+	node := p2p.CreateNewNode(ctx,*listenF)
 
-  peerChan := mdns.InitMDNS(context.Background(), ha, "meetmehere")
+	http.HandleFunc("/sendvote", func(w http.ResponseWriter, r *http.Request) {
+		from := r.FormValue("from")
+		to := r.FormValue("to")
 
-  peer := <-peerChan // will block untill we discover a peer
-  log.Println("Found peer:", peer, ", connecting")
+		log.Println("Executing vote", from, to)
 
-  err = ha.Connect(context.Background(), peer)
-  if err != nil {
-    log.Println("Connection failed:", err)
-  }
+		tx := p2p.Transaction{
+			Key: from,
+			Vote: to,
+		}
 
-  // open a stream, this stream will be handled by handleStream other end
-  stream, err := ha.NewStream(context.Background(),peer.ID, "/p2p/1.0.0")
+		err := json.NewEncoder(w).Encode(node.BroadcastBlock(&tx))
+		if err != nil {
+			panic(err)
+		}
+	})
 
-  if err != nil {
-    log.Println("Stream open failed", err)
-  } else {
-    rw := bufio.NewReadWriter(bufio.NewReader(stream), bufio.NewWriter(stream))
+	http.HandleFunc("/getnewaddress", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Call getnewaddress")
 
-    go p2p.WriteData(rw)
-    go p2p.ReadData(rw)
-  }
-  select {}
+		err := json.NewEncoder(w).Encode(node.GetNewAddress())
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	http.ListenAndServe(":1234", nil)
 }

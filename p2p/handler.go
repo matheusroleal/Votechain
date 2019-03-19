@@ -1,103 +1,75 @@
 package p2p
 
 import (
-	"bufio"
+	"context"
 	"log"
-	"fmt"
-	"os"
 	"sync"
 	"encoding/json"
-	"strings"
-	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	types "github.com/matheusroleal/Votechain/types"
 	blockchain "github.com/matheusroleal/Votechain/blockchain"
 )
 
+type Transaction struct {
+	Vote  string `json:"vote"`
+	Key   string `json:"key"`
+}
+
 var mutex = &sync.Mutex{}
 
-func ReadData(rw *bufio.ReadWriter) {
+func (node *Node) GetNewAddress() *types.GetNewAddressResponse {
+	var res types.GetNewAddressResponse
+	addr := node.wallet.GetNewAddress()
+	res.Address = addr
+	return &res
+}
+
+func (node *Node) BroadcastBlock(t *Transaction) *types.SendTxResponse{
+	var res types.SendTxResponse
+
+	last_index_block := len(node.blockchain.Chain) - 1
+	newBlock,e := blockchain.GenerateBlock(node.blockchain.Chain[last_index_block], t.Vote, t.Key)
+
+	mutex.Lock()
+	if e != nil {
+		log.Printf("ERROR: Could not generate block")
+	} else {
+		data, err := json.Marshal(newBlock)
+		if err != nil{
+			log.Printf("ERROR: Could not send block")
+		}
+		node.pubsub.Publish("blocks", data)
+	}
+	mutex.Unlock()
+	res.Txid = newBlock.Hash
+	return &res
+}
+
+func (node *Node) ListenBlocks(ctx context.Context) {
+	sub, err := node.pubsub.Subscribe("blocks")
+	if err != nil {
+		panic(err)
+	}
+	go func() {
 		for {
-			str, err := rw.ReadString('\n')
+			msg, err := sub.Next(ctx)
 			if err != nil {
-				log.Println("Error reading from buffer")
 				panic(err)
 			}
 
-			if str == "" {
+			block := blockchain.Block{}
+
+			err = json.Unmarshal(msg.GetData(), &block)
+			if err != nil {
 				return
 			}
 
-			if str != "\n" {
-				chain := make([]blockchain.Block, 0)
-
-				if err := json.Unmarshal([]byte(str), &chain); err != nil {
-					log.Println(err)
-				}
-				mutex.Lock()
-				blockchain.ReplaceChain(chain)
-				mutex.Unlock()
-
-			}
-		}
-}
-
-func WriteData(rw *bufio.ReadWriter) {
-	go func() {
-		for {
-			time.Sleep(5 * time.Second)
 			mutex.Lock()
-			bytes, err := json.Marshal(blockchain.Chain)
-			if err != nil {
-				log.Println(err)
-			}
+			blockchain.CreateChain(node.blockchain,block)
 			mutex.Unlock()
 
-			mutex.Lock()
-			rw.WriteString(fmt.Sprintf("%s\n", string(bytes)))
-			rw.Flush()
-			mutex.Unlock()
+			spew.Dump(node.blockchain.Chain)
 		}
 	}()
-
-	stdReader := bufio.NewReader(os.Stdin)
-
-	for {
-		fmt.Print("> ")
-		sendData, err := stdReader.ReadString('\n')
-		if err != nil {
-			log.Println("Error reading from stdin")
-			panic(err)
-		}
-
-		sentData := strings.Replace(sendData, "\n", "", -1)
-
-		tb := blockchain.Transaction{}
-		transaction := &tb
-		decoder := json.NewDecoder(strings.NewReader(sentData))
-		err = decoder.Decode(transaction)
-
-		blockchain.CreateChain(transaction)
-
-		bytes, err := json.Marshal(blockchain.Chain)
-		if err != nil {
-			log.Println(err)
-		}
-
-		spew.Dump(blockchain.Chain)
-
-		mutex.Lock()
-		_, err = rw.WriteString(fmt.Sprintf("%s\n", string(bytes)))
-		if err != nil {
-			log.Println("Error writing to buffer")
-			panic(err)
-		}
-		err = rw.Flush()
-		if err != nil {
-			log.Println("Error flushing buffer")
-			panic(err)
-		}
-		mutex.Unlock()
-
-	}
 }

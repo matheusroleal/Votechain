@@ -53,7 +53,7 @@ func GetNewAddress(c *cli.Context) error{
   if err != nil {
     return err
   }
-  fmt.Println(string(out))
+  log.Println(string(out))
   return nil
 }
 
@@ -62,8 +62,8 @@ func Call(cmd string, options map[string]string, out interface{}) error{
   for k, v := range options {
       vals.Set(k, v)
   }
-
-  resp, err := http.PostForm("http://127.0.0.1:1234/" + cmd, vals)
+  url := os.Getenv("VOTECHAIN_HOST")+":"+os.Getenv("VOTECHAIN_PORT")+"/"
+  resp, err := http.PostForm(url+ cmd, vals)
   if err != nil {
       return err
   }

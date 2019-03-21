@@ -9,7 +9,8 @@ Votechain is a parallel system to what is already being used. For this project, 
 ```
 make setup
 ```
-2) Run project
+2) Set Environment Variable
+3) Run project
 ```
 make run
 ```

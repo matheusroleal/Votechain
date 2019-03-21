@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"flag"
+	"os"
 
 	golog "github.com/ipfs/go-log"
   gologging "github.com/whyrusleeping/go-logging"
@@ -52,5 +53,5 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":1234", nil)
+	http.ListenAndServe(":"+os.Getenv("VOTECHAIN_PORT"), nil)
 }

@@ -1,2 +1,3 @@
 .DS_Store
 votechain-cli
+.env

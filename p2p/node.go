@@ -35,6 +35,12 @@ func CreateNewNode(ctx context.Context, listenF int) *Node {
 	if err != nil {
 		panic(err)
 	}
+  
+	node.blockchain = blkch
+  node.pubsub = pubsub
+	node.wallet = wallet.NewWallet()
+
+	node.ListenBlocks(ctx)
 
   peerChan := mdns.InitMDNS(context.Background(), ha, "meetmehere")
 
@@ -47,11 +53,6 @@ func CreateNewNode(ctx context.Context, listenF int) *Node {
   }
 
 	node.p2pNode = ha
-	node.blockchain = blkch
-  node.pubsub = pubsub
-	node.wallet = wallet.NewWallet()
-
-	node.ListenBlocks(ctx)
 
   return &node
 }

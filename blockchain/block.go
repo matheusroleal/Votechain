@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	wallet "github.com/matheusroleal/Votechain/wallet"
 )
 
 type Block struct {
@@ -35,7 +37,7 @@ func GenerateBlock(oldBlock Block, data string, key string) (Block, error) {
   newBlock.Index = oldBlock.Index + 1
   newBlock.Timestamp = time.Now().String()
 	newBlock.Vote = data
-	newBlock.Address = key
+	newBlock.Address = wallet.GetPlbAddress(key)
   newBlock.PrevHash = oldBlock.Hash
 	newBlock.Difficulty = difficulty
 

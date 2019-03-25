@@ -8,6 +8,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	types "github.com/matheusroleal/Votechain/types"
+	wallet "github.com/matheusroleal/Votechain/wallet"
 	blockchain "github.com/matheusroleal/Votechain/blockchain"
 )
 
@@ -20,7 +21,8 @@ var mutex = &sync.Mutex{}
 
 func (node *Node) GetNewAddress() *types.GetNewAddressResponse {
 	var res types.GetNewAddressResponse
-	addr := node.wallet.GetNewAddress()
+	w := wallet.NewWallet()
+	addr := w.GetPrivateKey()
 	res.Address = addr
 	return &res
 }

@@ -7,7 +7,6 @@ import (
   floodsub "github.com/libp2p/go-libp2p-pubsub"
   host "github.com/libp2p/go-libp2p-host"
   blockchain "github.com/matheusroleal/Votechain/blockchain"
-  wallet "github.com/matheusroleal/Votechain/wallet"
   mdns "github.com/matheusroleal/Votechain/mdns"
 )
 
@@ -15,7 +14,6 @@ type Node struct {
 	p2pNode    host.Host
 	blockchain *blockchain.Blockchain
   pubsub     *floodsub.PubSub
-	wallet	   *wallet.Wallet
 }
 
 func CreateNewNode(ctx context.Context, listenF int) *Node {
@@ -35,10 +33,9 @@ func CreateNewNode(ctx context.Context, listenF int) *Node {
 	if err != nil {
 		panic(err)
 	}
-  
+
 	node.blockchain = blkch
   node.pubsub = pubsub
-	node.wallet = wallet.NewWallet()
 
 	node.ListenBlocks(ctx)
 

@@ -10,6 +10,8 @@ setup-go:
 	go get github.com/dimfeld/httptreemux
 	go get github.com/onsi/gomega/...
 	go get github.com/davecgh/go-spew/spew
+	go get github.com/jbenet/go-base58
+	go get golang.org/x/crypto/ripemd160
 	go get github.com/libp2p/go-libp2p-pubsub
 
 setup-p2p-go:

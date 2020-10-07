@@ -34,3 +34,6 @@ make build
 ```
 ./votechain-cli sendvote -from=<private_address> -to=<vote>
  ```
+
+## Proposal Behind the Code
+For more information about the idea behind this project please read this [medium paper](https://medium.com/swlh/how-a-blockchain-based-system-can-help-on-election-reliability-a27edb67fd7c)
